@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "../Hitcon/DmaTest.h"
+#include "../Hitcon/LedMatrix.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,7 +94,8 @@ int main(void)
   MX_DMA_Init();
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
-  hitcon::DmaTest dmatest(hdma_memtomem_dma1_channel1);
+//  hitcon::DmaTest dmatest(hdma_memtomem_dma1_channel1);
+  hitcon::LedMatrix led_matrix;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -103,7 +105,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	dmatest.Trigger();
+//	dmatest.Trigger();
+	  led_matrix.trigger();
+//	    HAL_Delay(1000);
+//	    HAL_SuspendTick();
+//	    HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON,PWR_SLEEPENTRY_WFI);
+//	    HAL_ResumeTick();
   }
   /* USER CODE END 3 */
 }
