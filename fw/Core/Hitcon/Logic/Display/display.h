@@ -25,6 +25,9 @@
 
 void display_init();
 
+// Toggle the orientation of the display.
+void display_toggle_orientation();
+
 // Get the frame of the display at the given frame.
 // The size of `buf` should be DISPLAY_HEIGHT * DISPLAY_WIDTH
 void display_get_frame(uint8_t *buf, int frame);
