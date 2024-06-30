@@ -23,8 +23,11 @@
 #include "usart.h"
 #include "usb.h"
 #include "gpio.h"
-#include "Service/XBoardService.h"
-#include "Logic/XBoardLogic.h"
+
+#include <Logic/Display/display.h>
+#include <Service/XBoardService.h>
+#include <Logic/XBoardLogic.h>
+#include <Service/Sched/Scheduler.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -58,6 +61,20 @@ void SystemClock_Config(void);
 
 /* USER CODE END PFP */
 
+char my_buff1[8];
+char my_buff2[2] = {0xA1, 0x4C};
+void OnRxByte(void* arg1, void* arg2) {
+	uint8_t b = static_cast<uint8_t>(reinterpret_cast<size_t>(arg2));
+	my_buff1[1] = '\0';
+	if (b==0xA1) {
+		my_buff1[0] = '1';
+	} else if (b==0x4C) {
+		my_buff1[0] = '2';
+	} else {
+		my_buff1[0] = 'X';
+	}
+	display_set_mode_scroll_text(my_buff1, 15);
+}
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 /* USER CODE END 0 */
@@ -102,15 +119,24 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t loop_i = 0;
-  hitcon::service::xboard::uart_init();
+//  uint32_t loop_i = 0;
+//  hitcon::service::xboard::uart_init();
+  display_init();
+
   auto xboard_service = hitcon::service::xboard::XBoardService();
+  xboard_service.Init();
+  xboard_service.SetOnByteRx(OnRxByte, nullptr);
+  xboard_service.QueueDataForTx((unsigned char*)my_buff2, 2);
+  my_buff1[0] = '-';
+  my_buff1[1] = '\0';
+  display_set_mode_scroll_text(my_buff1, 15);
+  hitcon::service::sched::scheduler.Run();
   while (1)
   {
 //	  if (loop_i % 8 == 0) {
 //		  hitcon::service::xboard::send_ping();
 //	  }
-	  ++loop_i;
+//	  ++loop_i;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
