@@ -23,6 +23,7 @@ private:
 	void AutoRequeueCb(void *arg);
 public:
 	// For prio, see Scheduler.h
+	// interval is in ms.
 	constexpr PeriodicTask(unsigned prio, task_callback_t callback, void *thisptr, unsigned interval)
 	: DelayedTask(prio, (task_callback_t)&PeriodicTask::AutoRequeueCb, (void *)this, 0),
 	  enabled(false),

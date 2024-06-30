@@ -29,6 +29,7 @@ Lower priority value represents tasks that will be executed in shorter
 time frame (ie. higher priority).
 
 For background computation task, we use priority 800-1000.
+For non-time critical tx/rx such as UART, we use priority 500-600.
 For real time task that has soft deadline, such as button detection, we use
 priority 300-400.
 For real time task that has hard deadline, such as display refresh/trigger,
@@ -43,6 +44,8 @@ class Scheduler {
 public:
 	Scheduler();
 	virtual ~Scheduler();
+	// A task may NOT be queued before it started running, but can be
+	// queued after it started running.
 	bool Queue(Task *task, void *arg);
 	bool Queue(DelayedTask *task, void *arg);
 	bool Queue(PeriodicTask *task, void *arg); // Queued tasks are disabled by default

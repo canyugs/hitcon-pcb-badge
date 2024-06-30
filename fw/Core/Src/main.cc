@@ -23,6 +23,8 @@
 #include "usart.h"
 #include "usb.h"
 #include "gpio.h"
+#include "Service/XBoardService.h"
+#include "Logic/XBoardLogic.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -100,8 +102,15 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t loop_i = 0;
+  hitcon::service::xboard::uart_init();
+  auto xboard_service = hitcon::service::xboard::XBoardService();
   while (1)
   {
+//	  if (loop_i % 8 == 0) {
+//		  hitcon::service::xboard::send_ping();
+//	  }
+	  ++loop_i;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

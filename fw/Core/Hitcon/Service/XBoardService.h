@@ -5,47 +5,64 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "Service/Sched/Scheduler.h"
+#include "usart.h"
+
 namespace hitcon {
-
-constexpr size_t MAX_XBOARD_PACKET_LEN = 32;
-
-class XBoardPacket {
-public:
-  XBoardPacket() : size_(0){};
-
-  uint8_t *data() { return data_; }
-
-  size_t size() { return size_; }
-
-  void set_size(size_t s) { size_ = s; };
-
-private:
-  uint8_t data_[MAX_XBOARD_PACKET_LEN];
-  size_t size_;
-};
+namespace service {
+namespace xboard {
 
 class XBoardService {
 public:
-  XBoardService();
+    XBoardService();
 
-  // Call QueuePacketForTx() to queue a packet for transmission on
-  // the XBoard connection.
-  void QueuePacketForTx(uint8_t *packet, size_t packet_len);
+    void Init();
 
-  // On detected connection from a remote board, this will be called.
-  void SetOnConnectCallback(callback_t callback, void *callback_arg1);
+    // Append the data for transmit.
+    void QueueDataForTx(uint8_t* data, size_t len);
 
-  // On detected disconnection from a remote board, this will be called.
-  void SetOnDisconnectCallback(callback_t callback, void *callback_arg1);
+    // Whenever a byte is received, this will be called.
+    void SetOnByteRx(callback_t callback, void* callback_arg1);
 
-  // On received a packet from a remote board, this will be called with a
-  // pointer to packet struct.
-  void SetOnPacketCallback(callback_t callback, void *callback_arg1);
+    void NotifyTxFinish() {
+        tx_busy_ = false;
+    }
 
-private:
-  XBoardPacket packet_buffer[4];
+    void NotifyRxFinish();
+
+    static constexpr size_t kTxBufferSize = 128;
+   private:
+    // Internal service routine.
+    void Routine(void*);
+
+    void TriggerRx();
+
+    void OnRxWrapper(void *arg2);
+
+    UART_HandleTypeDef huart_;
+
+    callback_t on_rx_callback_;
+    void* on_rx_callback_arg1_;
+
+    bool tx_busy_ = false;
+
+    bool rx_task_busy_ = false;
+    hitcon::service::sched::Task rx_task_;
+
+    uint8_t rx_byte_;
+
+    uint8_t tx_buffer_[kTxBufferSize];
+    // Next byte to be written to hardware.
+    int tx_buffer_head_ = 0;
+    // Next byte from the upper layer.
+    int tx_buffer_tail_ = 0;
+
 };
 
-} // namespace hitcon
+extern XBoardService g_xboard_service;
+
+}  // namespace xboard
+}  // namespace service
+}  // namespace hitcon
 
 #endif // #ifndef HITCON_SERVICE_XBOARD_SERVICE_H_
