@@ -85,7 +85,8 @@ void TextEditorDisplay::draw(uint8_t *display_buf, int frame) const {
 
   // render the text to the 2D buffer
   char buf_2d[DISPLAY_HEIGHT][DISPLAY_WIDTH] = {0};
-  for (int i = 0; i < strlen(text_to_display); ++i) {
+  size_t len = strlen(text_to_display);
+  for (int i = 0; i < len; ++i) {
     render_char(buf_2d, text_to_display[i], i * CHAR_WIDTH, 0, DISPLAY_WIDTH,
                 DISPLAY_HEIGHT);
   }
